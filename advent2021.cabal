@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ae9e563ef5a10c1308bd60c2a7f75b9ce431a545dbcca103e92ce0a533f1c942
+-- hash: c2c378d085e5df0ee76612c2d3fb1257c10ba76b4105449401e54922c549a69c
 
 name:           advent2021
 version:        0.1.0.0
@@ -27,13 +27,28 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Advent.BitUtils
+      Advent.CommonParsers
+      Advent.Input
+      Advent.ListUtils
+      Advent.Parse
+      Advent.PuzzleAnswerPair
+      Advent2021.Day01
+      Advent2021.Solve
   other-modules:
       Paths_advent2021
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , binary
+    , bytestring
+    , filepath
+    , megaparsec
+    , parser-combinators
+    , tasty
+    , tasty-golden
+    , text
   default-language: Haskell2010
 
 executable advent2021-exe
@@ -46,6 +61,14 @@ executable advent2021-exe
   build-depends:
       advent2021
     , base >=4.7 && <5
+    , binary
+    , bytestring
+    , filepath
+    , megaparsec
+    , parser-combinators
+    , tasty
+    , tasty-golden
+    , text
   default-language: Haskell2010
 
 test-suite advent2021-test
@@ -59,4 +82,12 @@ test-suite advent2021-test
   build-depends:
       advent2021
     , base >=4.7 && <5
+    , binary
+    , bytestring
+    , filepath
+    , megaparsec
+    , parser-combinators
+    , tasty
+    , tasty-golden
+    , text
   default-language: Haskell2010
