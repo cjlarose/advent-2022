@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: af0516ab84d2fbfb2bf6ff6f43eee47fb8f88135f8fb46a8f90f68f4afb009ff
+-- hash: c61e8672db42403d9834e78bfd30d2e438aebdc72102d2d590e1073b04d9bfad
 
 name:           advent2021
 version:        0.1.0.0
@@ -46,6 +46,7 @@ library
     , bytestring
     , filepath
     , megaparsec
+    , mtl
     , parser-combinators
     , tasty
     , tasty-golden
@@ -66,6 +67,7 @@ executable advent2021-exe
     , bytestring
     , filepath
     , megaparsec
+    , mtl
     , parser-combinators
     , tasty
     , tasty-golden
@@ -87,6 +89,7 @@ test-suite advent2021-test
     , bytestring
     , filepath
     , megaparsec
+    , mtl
     , parser-combinators
     , tasty
     , tasty-golden
