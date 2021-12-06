@@ -55,12 +55,38 @@ totalDisplacement xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
       put state{submarine=newSub}
       runSub xs
 
+totalDisplacementWithAim :: [Command] -> Submarine
+totalDisplacementWithAim xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
+  where
+    runSub :: [Command] -> State SubmarineState Submarine
+    runSub [] = do
+      SubmarineState sub _ <- get
+      return sub
+    runSub ((Forward x):xs) = do
+      state@(SubmarineState sub _) <- get
+      let newDepth = depth sub + aim state * fromIntegral x
+      let newSub = sub{horizontalPosition=horizontalPosition sub + fromIntegral x
+                      ,depth=newDepth}
+      put state{submarine=newSub}
+      runSub xs
+    runSub ((Down x):xs) = do
+      state@(SubmarineState sub _) <- get
+      let newAim = aim state + fromIntegral x
+      put state{aim=newAim}
+      runSub xs
+    runSub ((Up x):xs) = do
+      state@(SubmarineState sub _) <- get
+      let newAim = aim state - fromIntegral x
+      put state{aim=newAim}
+      runSub xs
+
 printResults :: [Command] -> PuzzleAnswerPair
 printResults depths = PuzzleAnswerPair (part1, part2)
   where
     Submarine pos depth = totalDisplacement depths
     part1 = show $ pos * depth
-    part2 = "not yet implemented"
+    Submarine pos' depth' = totalDisplacementWithAim depths
+    part2 = show $ pos' * depth'
 
 solve :: IO (Either String PuzzleAnswerPair)
 solve = parse inputParser printResults <$> getProblemInputAsText 2
