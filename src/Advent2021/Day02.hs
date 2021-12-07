@@ -31,32 +31,18 @@ inputParser = some command <* eof
                      ]
 
 data Submarine = Submarine { horizontalPosition :: Int, depth :: Int }
-data SubmarineState = SubmarineState { submarine :: Submarine, aim :: Int }
-type MySubmarine = State SubmarineState
 type Aim = State Int
 
 totalDisplacement :: [Command] -> Submarine
-totalDisplacement xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
+totalDisplacement = foldl' runSub (Submarine 0 0)
   where
-    runSub :: [Command] -> MySubmarine Submarine
-    runSub [] = do
-      SubmarineState sub _ <- get
-      return sub
-    runSub ((Forward x):xs) = do
-      state@(SubmarineState sub _) <- get
-      let newSub = sub{horizontalPosition=horizontalPosition sub + fromIntegral x}
-      put state{submarine=newSub}
-      runSub xs
-    runSub ((Down x):xs) = do
-      state@(SubmarineState sub _) <- get
-      let newSub = sub{depth=depth sub + fromIntegral x}
-      put state{submarine=newSub}
-      runSub xs
-    runSub ((Up x):xs) = do
-      state@(SubmarineState sub _) <- get
-      let newSub = sub{depth=depth sub - fromIntegral x}
-      put state{submarine=newSub}
-      runSub xs
+    runSub :: Submarine -> Command -> Submarine
+    runSub sub (Forward x) =
+      sub{horizontalPosition=horizontalPosition sub + fromIntegral x}
+    runSub sub (Down x) =
+      sub{depth=depth sub + fromIntegral x}
+    runSub sub (Up x) =
+      sub{depth=depth sub - fromIntegral x}
 
 totalDisplacementWithAim :: [Command] -> Submarine
 totalDisplacementWithAim xs = evalState (foldM runSub (Submarine 0 0) xs) 0
