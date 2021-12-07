@@ -7,6 +7,7 @@ module Advent2021.Day02
 import Numeric.Natural (Natural)
 import Text.Megaparsec ((<|>), eof, some)
 import Control.Monad.Combinators (choice)
+import Control.Monad (foldM)
 import Data.Text (Text)
 import Data.List (foldl')
 import Control.Monad.State (State, evalState, get, put)
@@ -32,6 +33,7 @@ inputParser = some command <* eof
 data Submarine = Submarine { horizontalPosition :: Int, depth :: Int }
 data SubmarineState = SubmarineState { submarine :: Submarine, aim :: Int }
 type MySubmarine = State SubmarineState
+type Aim = State Int
 
 totalDisplacement :: [Command] -> Submarine
 totalDisplacement xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
@@ -57,29 +59,25 @@ totalDisplacement xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
       runSub xs
 
 totalDisplacementWithAim :: [Command] -> Submarine
-totalDisplacementWithAim xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
+totalDisplacementWithAim xs = evalState (foldM runSub (Submarine 0 0) xs) 0
   where
-    runSub :: [Command] -> MySubmarine Submarine
-    runSub [] = do
-      SubmarineState sub _ <- get
-      return sub
-    runSub ((Forward x):xs) = do
-      state@(SubmarineState sub _) <- get
-      let newDepth = depth sub + aim state * fromIntegral x
+    runSub :: Submarine -> Command -> Aim Submarine
+    runSub sub (Forward x) = do
+      aim <- get
+      let newDepth = depth sub + aim * fromIntegral x
       let newSub = sub{horizontalPosition=horizontalPosition sub + fromIntegral x
                       ,depth=newDepth}
-      put state{submarine=newSub}
-      runSub xs
-    runSub ((Down x):xs) = do
-      state@(SubmarineState sub _) <- get
-      let newAim = aim state + fromIntegral x
-      put state{aim=newAim}
-      runSub xs
-    runSub ((Up x):xs) = do
-      state@(SubmarineState sub _) <- get
-      let newAim = aim state - fromIntegral x
-      put state{aim=newAim}
-      runSub xs
+      return newSub
+    runSub sub (Down x) = do
+      aim <- get
+      let newAim = aim + fromIntegral x
+      put newAim
+      return sub
+    runSub sub (Up x) = do
+      aim <- get
+      let newAim = aim - fromIntegral x
+      put newAim
+      return sub
 
 printResults :: [Command] -> PuzzleAnswerPair
 printResults depths = PuzzleAnswerPair (part1, part2)
