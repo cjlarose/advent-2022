@@ -10,7 +10,7 @@ import Control.Monad.Combinators (choice)
 import Control.Monad (foldM)
 import Data.Text (Text)
 import Data.List (foldl')
-import Control.Monad.State (State, evalState, get, put)
+import Control.Monad.State (State, evalState, get, put, state)
 import Advent.Input (getProblemInputAsText)
 import Advent.PuzzleAnswerPair (PuzzleAnswerPair(..))
 import Advent.Parse (Parser, parse)
@@ -54,16 +54,8 @@ totalDisplacementWithAim xs = evalState (foldM runSub (Submarine 0 0) xs) 0
       let newSub = sub{horizontalPosition=horizontalPosition sub + fromIntegral x
                       ,depth=newDepth}
       return newSub
-    runSub sub (Down x) = do
-      aim <- get
-      let newAim = aim + fromIntegral x
-      put newAim
-      return sub
-    runSub sub (Up x) = do
-      aim <- get
-      let newAim = aim - fromIntegral x
-      put newAim
-      return sub
+    runSub sub (Down x) = state (\aim -> (sub, aim + fromIntegral x))
+    runSub sub (Up x) = state (\aim -> (sub, aim - fromIntegral x))
 
 printResults :: [Command] -> PuzzleAnswerPair
 printResults depths = PuzzleAnswerPair (part1, part2)
