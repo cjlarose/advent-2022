@@ -1,14 +1,14 @@
 module Advent.Input
-  ( getProblemInputAsText
-  , withSuccessfulParse
-  ) where
+  ( getProblemInputAsText,
+    withSuccessfulParse,
+  )
+where
 
-import Text.Megaparsec (parse)
+import Advent.Parse (Parser)
+import Advent.PuzzleAnswerPair (PuzzleAnswerPair)
 import Data.Text (Text)
 import qualified Data.Text.IO (readFile)
-
-import Advent.PuzzleAnswerPair (PuzzleAnswerPair)
-import Advent.Parse (Parser)
+import Text.Megaparsec (parse)
 
 path :: Int -> String
 path problemNumber = "inputs/" ++ show problemNumber ++ ".txt"

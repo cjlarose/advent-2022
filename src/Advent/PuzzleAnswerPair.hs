@@ -1,5 +1,6 @@
 module Advent.PuzzleAnswerPair
-  ( PuzzleAnswerPair(..)
-  ) where
+  ( PuzzleAnswerPair (..),
+  )
+where
 
 newtype PuzzleAnswerPair = PuzzleAnswerPair (String, String)

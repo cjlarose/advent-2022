@@ -1,9 +1,10 @@
 module Advent.BitUtils
-  ( fromBits
-  ) where
+  ( fromBits,
+  )
+where
 
+import Data.Bits (Bits, setBit, shiftL, zeroBits)
 import Data.Foldable (foldl')
-import Data.Bits (Bits, shiftL, zeroBits, setBit)
 
 fromBits :: (Foldable t, Bits b) => t Bool -> b
 fromBits = foldl' f zeroBits

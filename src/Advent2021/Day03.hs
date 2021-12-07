@@ -1,22 +1,23 @@
 module Advent2021.Day03
-  ( solve
-  ) where
+  ( solve,
+  )
+where
 
-import Advent.Input (getProblemInputAsText)
-import Advent.PuzzleAnswerPair (PuzzleAnswerPair(..))
-import Advent.Parse (Parser, parse)
-import Advent.CommonParsers (linesOf, unsignedBinaryInteger)
 import Advent.BitUtils (fromBits)
+import Advent.CommonParsers (linesOf, unsignedBinaryInteger)
+import Advent.Input (getProblemInputAsText)
+import Advent.Parse (Parser, parse)
+import Advent.PuzzleAnswerPair (PuzzleAnswerPair (..))
 import Data.Bits (testBit, xor)
-import Data.List (sort, group)
+import Data.List (group, sort)
 
-newtype DianosticEntry = DianosticEntry Int deriving Show
+newtype DianosticEntry = DianosticEntry Int deriving (Show)
 
 inputParser :: Parser [DianosticEntry]
 inputParser = linesOf (DianosticEntry <$> unsignedBinaryInteger)
 
 gamma :: [DianosticEntry] -> Int
-gamma diagnostics = fromBits . map mostCommonBitInPosition $ [11,10..0]
+gamma diagnostics = fromBits . map mostCommonBitInPosition $ [11, 10 .. 0]
   where
     bitsInPosition :: Int -> [Bool]
     bitsInPosition i = map (\(DianosticEntry x) -> testBit x i) diagnostics
@@ -24,7 +25,7 @@ gamma diagnostics = fromBits . map mostCommonBitInPosition $ [11,10..0]
     mostCommonBitInPosition :: Int -> Bool
     mostCommonBitInPosition i = if numZeros > numOnes then False else True
       where
-        numZeros:numOnes:_ = map length . group . sort . bitsInPosition $ i
+        numZeros : numOnes : _ = map length . group . sort . bitsInPosition $ i
 
 powerConsumption :: [DianosticEntry] -> Int
 powerConsumption diagnostics = gammaRate * epsilonRate

@@ -1,19 +1,20 @@
 module Advent.CommonParsers
-  ( linesOf
-  , natural
-  , integerWithOptionalLeadingSign
-  , unsignedBinaryInteger
-  , token
-  , symbol
-  ) where
+  ( linesOf,
+    natural,
+    integerWithOptionalLeadingSign,
+    unsignedBinaryInteger,
+    token,
+    symbol,
+  )
+where
 
-import Numeric.Natural (Natural)
-import Data.Void (Void)
-import Data.Text (Text)
-import Text.Megaparsec (Parsec, some, sepEndBy1, eof, option, (<|>))
-import Text.Megaparsec.Char (newline, digitChar, char, string, space)
 import Advent.BitUtils (fromBits)
 import Data.Bits (Bits)
+import Data.Text (Text)
+import Data.Void (Void)
+import Numeric.Natural (Natural)
+import Text.Megaparsec (Parsec, eof, option, sepEndBy1, some, (<|>))
+import Text.Megaparsec.Char (char, digitChar, newline, space, string)
 
 type Parser = Parsec Void Text
 

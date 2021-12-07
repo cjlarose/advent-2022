@@ -1,8 +1,9 @@
 module Advent2021.Solve
-  ( solverForProblem
-  ) where
+  ( solverForProblem,
+  )
+where
 
-import Advent.PuzzleAnswerPair (PuzzleAnswerPair(..))
+import Advent.PuzzleAnswerPair (PuzzleAnswerPair (..))
 import qualified Advent2021.Day01
 import qualified Advent2021.Day02
 import qualified Advent2021.Day03
