@@ -31,11 +31,12 @@ inputParser = some command <* eof
 
 data Submarine = Submarine { horizontalPosition :: Int, depth :: Int }
 data SubmarineState = SubmarineState { submarine :: Submarine, aim :: Int }
+type MySubmarine = State SubmarineState
 
 totalDisplacement :: [Command] -> Submarine
 totalDisplacement xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
   where
-    runSub :: [Command] -> State SubmarineState Submarine
+    runSub :: [Command] -> MySubmarine Submarine
     runSub [] = do
       SubmarineState sub _ <- get
       return sub
@@ -58,7 +59,7 @@ totalDisplacement xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
 totalDisplacementWithAim :: [Command] -> Submarine
 totalDisplacementWithAim xs = evalState (runSub xs) (SubmarineState (Submarine 0 0) 0)
   where
-    runSub :: [Command] -> State SubmarineState Submarine
+    runSub :: [Command] -> MySubmarine Submarine
     runSub [] = do
       SubmarineState sub _ <- get
       return sub
