@@ -50,10 +50,9 @@ totalDisplacementWithAim xs = evalState (foldM runSub (Submarine 0 0) xs) 0
     runSub :: Submarine -> Command -> Aim Submarine
     runSub sub (Forward x) = do
       aim <- get
+      let newPos = horizontalPosition sub + fromIntegral x
       let newDepth = depth sub + aim * fromIntegral x
-      let newSub = sub{horizontalPosition=horizontalPosition sub + fromIntegral x
-                      ,depth=newDepth}
-      return newSub
+      return $ Submarine newPos newDepth
     runSub sub (Down x) = state (\aim -> (sub, aim + fromIntegral x))
     runSub sub (Up x) = state (\aim -> (sub, aim - fromIntegral x))
 
