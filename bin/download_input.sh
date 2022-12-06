@@ -13,6 +13,7 @@ then
 fi
 
 problem_number=$1
-url='https://adventofcode.com/2021/day/'$problem_number'/input'
+url='https://adventofcode.com/2022/day/'$problem_number'/input'
 output_filename=inputs/"$problem_number".txt
+mkdir -p inputs
 curl --silent "$url" -H 'Cookie: '"$ADVENT_SESSION_COOKIE" > "$output_filename"

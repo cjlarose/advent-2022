@@ -5,7 +5,7 @@ import Data.Binary.Put (runPut, putCharUtf8, putStringUtf8)
 import Test.Tasty (defaultMain, TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString, findByExtension)
 
-import Advent2021.Solve (solverForProblem)
+import Advent2022.Solve (solverForProblem)
 import Advent.PuzzleAnswerPair (PuzzleAnswerPair(..))
 
 resultToBS :: ((String, String) -> String) -> Either String PuzzleAnswerPair -> LBS.ByteString

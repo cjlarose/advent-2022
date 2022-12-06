@@ -4,7 +4,7 @@ import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
 import System.Exit (exitFailure)
 
-import Advent2021.Solve (solverForProblem)
+import Advent2022.Solve (solverForProblem)
 import Advent.PuzzleAnswerPair (PuzzleAnswerPair(..))
 
 main :: IO ()
@@ -19,4 +19,4 @@ main = do
         Right (PuzzleAnswerPair (part1, part2)) -> do
           let output = part1 ++ "\n" ++ part2
           putStrLn output
-    _ -> hPutStrLn stderr "Usage: advent2021-exe problem-number"
+    _ -> hPutStrLn stderr "Usage: advent2022-exe problem-number"
