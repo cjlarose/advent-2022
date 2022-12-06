@@ -51,11 +51,24 @@ predictedScore = sum . map (gameScore . (\(x, y) -> (x, makeChoice y)))
     makeChoice Y = Paper
     makeChoice Z = Scissors
 
+predictedScoreWithCorrectInterpretation :: [GameStrat] -> Int
+predictedScoreWithCorrectInterpretation = sum . map (gameScore . (\(x, y) -> (x, makeChoice (x, y))))
+  where
+    makeChoice (Rock, X) = Scissors
+    makeChoice (Rock, Y) = Rock
+    makeChoice (Rock, Z) = Paper
+    makeChoice (Paper, X) = Rock
+    makeChoice (Paper, Y) = Paper
+    makeChoice (Paper, Z) = Scissors
+    makeChoice (Scissors, X) = Paper
+    makeChoice (Scissors, Y) = Scissors
+    makeChoice (Scissors, Z) = Rock
+
 printResults :: [GameStrat] -> PuzzleAnswerPair
 printResults games = PuzzleAnswerPair (part1, part2)
   where
     part1 = show . predictedScore $ games
-    part2 = ""
+    part2 = show . predictedScoreWithCorrectInterpretation $ games
 
 solve :: IO (Either String PuzzleAnswerPair)
 solve = parse inputParser printResults <$> getProblemInputAsText 2
