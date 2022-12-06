@@ -32,6 +32,7 @@ library
       Advent.Parse
       Advent.PuzzleAnswerPair
       Advent2022.Day01
+      Advent2022.Day02
       Advent2022.Solve
   other-modules:
       Paths_advent2022
