@@ -27,11 +27,16 @@ numSubsets = length . filter hasSubset
   where
     hasSubset ((a, b), (x, y)) = x >= a && y <= b || a >= x && b <= y
 
+numOverlapping :: [AssignmentPair] -> Int
+numOverlapping = length . filter hasOverlap
+  where
+    hasOverlap ((a, b), (x, y)) = x >= a && x <= b || y >= a && y <= b || a >= x && a <= y || b >= x && b <= y
+
 printResults :: [AssignmentPair] -> PuzzleAnswerPair
 printResults sacks = PuzzleAnswerPair (part1, part2)
   where
     part1 = show . numSubsets $ sacks
-    part2 = ""
+    part2 = show . numOverlapping $ sacks
 
 solve :: IO (Either String PuzzleAnswerPair)
 solve = parse inputParser printResults <$> getProblemInputAsText 4
