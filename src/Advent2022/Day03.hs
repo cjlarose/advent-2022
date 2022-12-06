@@ -30,11 +30,18 @@ misplacedItemPrioritySum = sum . map f
   where
     f (left, right) = head $ left `intersect` right
 
+groupPrioritySum :: [Rucksack] -> Int
+groupPrioritySum [] = 0
+groupPrioritySum (a : b : c : xs) = commonItem + groupPrioritySum xs
+  where
+    allItems (l, r) = l ++ r
+    commonItem = head $ allItems a `intersect` allItems b `intersect` allItems c
+
 printResults :: [Rucksack] -> PuzzleAnswerPair
 printResults sacks = PuzzleAnswerPair (part1, part2)
   where
     part1 = show . misplacedItemPrioritySum $ sacks
-    part2 = ""
+    part2 = show . groupPrioritySum $ sacks
 
 solve :: IO (Either String PuzzleAnswerPair)
 solve = parse inputParser printResults <$> getProblemInputAsText 3
