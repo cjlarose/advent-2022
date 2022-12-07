@@ -22,9 +22,9 @@ prefixLength xs = f 0 initialBitSet xs
     initialBitSet = foldl' (\acc x -> setBit acc x) 0 . take 4 $ xs
 
     f :: Int -> Int -> [Int] -> Int
-    f dropped bits (a:b:c:d:xs)
-      | popCount (setBit bits d) == 4 = dropped + 3
-      | otherwise = f (dropped + 1) (setBit (clearBit bits a) d) (b:c:d:xs)
+    f dropped bits xs
+      | popCount (setBit bits (xs !! 3)) == 4 = dropped + 3
+      | otherwise = f (dropped + 1) (setBit (clearBit bits (head xs)) (xs !! 3)) (tail xs)
 
 printResults :: [Int] -> PuzzleAnswerPair
 printResults input = PuzzleAnswerPair (part1, part2)
