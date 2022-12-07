@@ -60,8 +60,8 @@ stackMove = makeMove <$> (symbol "move" *> token natural <* symbol "from") <*> (
   where
     makeMove n i j = StackMove n (i - 1) (j - 1)
 
-applyStackMoves :: [StackMove] -> State Stacks ()
-applyStackMoves = mapM_ applyStackMove
+applyStackMoves :: Bool -> [StackMove] -> State Stacks ()
+applyStackMoves moveMultipleCrates = mapM_ applyStackMove
   where
     applyStackMove :: StackMove -> State Stacks ()
     applyStackMove move = do
@@ -72,7 +72,7 @@ applyStackMoves = mapM_ applyStackMove
       let sourceStack = stacks V.! i
       let destStack = stacks V.! j
       let (crates, newSource) = splitAt n sourceStack
-      let newDest = reverse crates ++ destStack
+      let newDest = (if moveMultipleCrates then crates else reverse crates) ++ destStack
       let updates = [(i, newSource), (j, newDest)]
       let newStacks = stacks V.// updates
       put newStacks
@@ -80,14 +80,14 @@ applyStackMoves = mapM_ applyStackMove
 getTopOfStacks :: State Stacks [Char]
 getTopOfStacks = map head . V.toList <$> get
 
-topOfStacks :: ProblemInput -> String
-topOfStacks input = evalState (applyStackMoves (inputMoves input) >> getTopOfStacks) . inputStacks $ input
+topOfStacks :: Bool -> ProblemInput -> String
+topOfStacks moveMultipleCrates input = evalState (applyStackMoves moveMultipleCrates (inputMoves input) >> getTopOfStacks) . inputStacks $ input
 
 printResults :: ProblemInput -> PuzzleAnswerPair
 printResults input = PuzzleAnswerPair (part1, part2)
   where
-    part1 = topOfStacks input
-    part2 = ""
+    part1 = topOfStacks False input
+    part2 = topOfStacks True input
 
 solve :: IO (Either String PuzzleAnswerPair)
 solve = parse inputParser printResults <$> getProblemInputAsText 5
