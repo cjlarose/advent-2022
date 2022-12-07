@@ -19,7 +19,7 @@ prefixLength :: Int -> [Int] -> Int
 prefixLength n xs = f 0 xs
   where
     numUniques :: [Int] -> Int
-    numUniques = popCount . foldl' (\acc x -> setBit acc x) (0 :: Int)
+    numUniques = popCount . foldl' setBit (0 :: Int)
 
     f :: Int -> [Int] -> Int
     f dropped xs
