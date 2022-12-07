@@ -13,7 +13,7 @@ import Data.Bits (Bits)
 import Data.Text (Text)
 import Data.Void (Void)
 import Numeric.Natural (Natural)
-import Text.Megaparsec (Parsec, eof, option, sepEndBy1, some, (<|>))
+import Text.Megaparsec (Parsec, option, sepEndBy1, some, (<|>))
 import Text.Megaparsec.Char (char, digitChar, newline, space, string)
 
 type Parser = Parsec Void Text
@@ -33,7 +33,7 @@ unsignedBinaryInteger = fromBits <$> some bit
     bit = False <$ char '0' <|> True <$ char '1'
 
 linesOf :: Parser a -> Parser [a]
-linesOf p = sepEndBy1 p newline <* eof
+linesOf p = sepEndBy1 p newline
 
 token :: Parser a -> Parser a
 token p = p <* space

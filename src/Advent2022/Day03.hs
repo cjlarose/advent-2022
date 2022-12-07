@@ -9,14 +9,14 @@ import Advent.Parse (Parser, parse)
 import Advent.PuzzleAnswerPair (PuzzleAnswerPair (..))
 import Data.List (sort, intersect)
 import Data.Char (isLower, ord)
-import Text.Megaparsec (some)
+import Text.Megaparsec (some, eof)
 import Text.Megaparsec.Char (letterChar)
 
 type ItemPriority = Int
 type Rucksack = ([ItemPriority], [ItemPriority])
 
 inputParser :: Parser [Rucksack]
-inputParser = linesOf rucksack
+inputParser = linesOf rucksack <* eof
 
 rucksack :: Parser Rucksack
 rucksack = readCompartments <$> some (priority <$> letterChar)

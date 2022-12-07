@@ -9,14 +9,14 @@ import Advent.PuzzleAnswerPair (PuzzleAnswerPair (..))
 import Advent.CommonParsers (linesOf)
 import Data.List (sort, intersect)
 import Data.Char (isLower, ord)
-import Text.Megaparsec (some)
+import Text.Megaparsec (some, eof)
 import Text.Megaparsec.Char (char, digitChar)
 
 type SectionAssignment = (Int, Int)
 type AssignmentPair = (SectionAssignment, SectionAssignment)
 
 inputParser :: Parser [AssignmentPair]
-inputParser = linesOf assignmentPair
+inputParser = linesOf assignmentPair <* eof
   where
     assignmentPair = (,) <$> sectionAssignment <* char ',' <*> sectionAssignment
     sectionAssignment = (,) <$> section <* char '-' <*> section
