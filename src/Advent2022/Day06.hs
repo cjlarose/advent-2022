@@ -15,22 +15,22 @@ import Text.Megaparsec.Char (lowerChar, newline, eol)
 inputParser :: Parser [Int]
 inputParser = map (\c -> ord c - ord 'a') <$> some lowerChar <* newline <* eof
 
-prefixLength :: [Int] -> Int
-prefixLength xs = f 0 initialBitSet xs
+prefixLength :: Int -> [Int] -> Int
+prefixLength n xs = f 0 xs
   where
-    initialBitSet :: Int
-    initialBitSet = foldl' (\acc x -> setBit acc x) 0 . take 4 $ xs
+    toBitSet :: [Int] -> Int
+    toBitSet = foldl' (\acc x -> setBit acc x) 0
 
-    f :: Int -> Int -> [Int] -> Int
-    f dropped bits xs
-      | popCount (setBit bits (xs !! 3)) == 4 = dropped + 3
-      | otherwise = f (dropped + 1) (setBit (clearBit bits (head xs)) (xs !! 3)) (tail xs)
+    f :: Int -> [Int] -> Int
+    f dropped xs
+      | popCount (toBitSet . take n $ xs) == n = dropped + n
+      | otherwise = f (dropped + 1) (tail xs)
 
 printResults :: [Int] -> PuzzleAnswerPair
 printResults input = PuzzleAnswerPair (part1, part2)
   where
-    part1 = show . prefixLength $ input
-    part2 = ""
+    part1 = show . prefixLength 4 $ input
+    part2 = show . prefixLength 14 $ input
 
 solve :: IO (Either String PuzzleAnswerPair)
 solve = parse inputParser printResults <$> getProblemInputAsText 6
