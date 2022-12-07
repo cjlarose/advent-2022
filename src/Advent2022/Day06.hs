@@ -18,12 +18,12 @@ inputParser = map (\c -> ord c - ord 'a') <$> some lowerChar <* newline <* eof
 prefixLength :: Int -> [Int] -> Int
 prefixLength n xs = f 0 xs
   where
-    toBitSet :: [Int] -> Int
-    toBitSet = foldl' (\acc x -> setBit acc x) 0
+    numUniques :: [Int] -> Int
+    numUniques = popCount . foldl' (\acc x -> setBit acc x) (0 :: Int)
 
     f :: Int -> [Int] -> Int
     f dropped xs
-      | popCount (toBitSet . take n $ xs) == n = dropped + n
+      | (numUniques . take n $ xs) == n = dropped + n
       | otherwise = f (dropped + 1) (tail xs)
 
 printResults :: [Int] -> PuzzleAnswerPair
