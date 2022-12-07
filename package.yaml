@@ -30,6 +30,7 @@ dependencies:
 - tasty
 - tasty-golden
 - text
+- vector
 
 library:
   source-dirs: src
