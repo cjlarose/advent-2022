@@ -72,7 +72,7 @@ applyStackMoves = mapM_ applyStackMove
       let sourceStack = stacks V.! i
       let destStack = stacks V.! j
       let (crates, newSource) = splitAt n sourceStack
-      let newDest = crates ++ destStack
+      let newDest = reverse crates ++ destStack
       let updates = [(i, newSource), (j, newDest)]
       let newStacks = stacks V.// updates
       put newStacks
