@@ -7,6 +7,8 @@ import Advent.Input (getProblemInputAsText)
 import Advent.Parse (Parser, parse)
 import Advent.PuzzleAnswerPair (PuzzleAnswerPair (..))
 import Data.Char (ord)
+import Data.List (foldl')
+import Data.Bits (setBit, clearBit, popCount)
 import Text.Megaparsec (some, eof)
 import Text.Megaparsec.Char (lowerChar, newline, eol)
 
@@ -14,12 +16,15 @@ inputParser :: Parser [Int]
 inputParser = map (\c -> ord c - ord 'a') <$> some lowerChar <* newline <* eof
 
 prefixLength :: [Int] -> Int
-prefixLength = f 0
+prefixLength xs = f 0 initialBitSet xs
   where
-    f :: Int -> [Int] -> Int
-    f dropped (a:b:c:d:xs)
-      | a /= b && a /= c && a /= c && a /= d && b /= c && b /= d && c /= d = dropped + 4
-      | otherwise = f (dropped + 1) $ b:c:d:xs
+    initialBitSet :: Int
+    initialBitSet = foldl' (\acc x -> setBit acc x) 0 . take 4 $ xs
+
+    f :: Int -> Int -> [Int] -> Int
+    f dropped bits (a:b:c:d:xs)
+      | popCount (setBit bits d) == 4 = dropped + 3
+      | otherwise = f (dropped + 1) (setBit (clearBit bits a) d) (b:c:d:xs)
 
 printResults :: [Int] -> PuzzleAnswerPair
 printResults input = PuzzleAnswerPair (part1, part2)
