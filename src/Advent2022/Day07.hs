@@ -16,7 +16,7 @@ import Text.Megaparsec.Char (lowerChar, newline, eol, string, letterChar, char, 
 
 data Command = ChangeDirectory Text | DirectoryListing [File]
 data File = Directory Text | RegularFile Int Text deriving (Eq, Ord)
-type DirectoryTree = Map.Map [Text] [File]
+type DirectoryTree = Map.Map [File] [File] -- dir path => listing
 
 inputParser :: Parser [Command]
 inputParser = some command <* eof
@@ -38,21 +38,20 @@ buildDirectoryTree = f Map.empty []
   where
     f tree _ [] = tree
     f tree path (ChangeDirectory ".." : xs) = f tree (tail path) xs
-    f tree path (ChangeDirectory dir : xs) = f tree (dir : path) xs
+    f tree path (ChangeDirectory dir : xs) = f tree (Directory dir : path) xs
     f tree path (DirectoryListing files : xs) = f (Map.insert path files tree) path xs
 
 allFileSizes :: DirectoryTree -> Map.Map [File] Int
 allFileSizes tree = sizes [] (Directory "/")
   where
     sizes :: [File] -> File -> Map.Map [File] Int
-    sizes parentPath f@(RegularFile size name) = Map.singleton (f: parentPath) size
-    sizes parentPath f@(Directory name) =
+    sizes parentPath f@(RegularFile size _) = Map.singleton (f : parentPath) size
+    sizes parentPath f@(Directory _) =
       let
-        children = tree ! (name : map fname parentPath)
-        fname (RegularFile _ n) = n
-        fname (Directory n) = n
-        newKnownSizes = foldl Map.union Map.empty . map (sizes (f : parentPath)) $ children
-      in Map.insert (f : parentPath) (sum . map (\x -> newKnownSizes ! (x : f : parentPath)) $ children) newKnownSizes
+        path = f : parentPath
+        children = tree ! path
+        newKnownSizes = foldl Map.union Map.empty . map (sizes path) $ children
+      in Map.insert path (sum . map (\x -> newKnownSizes ! (x : path)) $ children) newKnownSizes
 
 sumOfSizesOfSmolDirectories :: [Command] -> Int
 sumOfSizesOfSmolDirectories = sum . Map.elems . Map.filter (\x -> x <= 100000) . Map.filterWithKey (\k _ -> isDir k) . allFileSizes . buildDirectoryTree
