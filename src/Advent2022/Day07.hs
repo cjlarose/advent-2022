@@ -42,16 +42,16 @@ buildDirectoryTree = f Map.empty []
     f tree path (DirectoryListing files : xs) = f (Map.insert path files tree) path xs
 
 allFileSizes :: DirectoryTree -> Map.Map [File] Int
-allFileSizes tree = sizes [] (Directory "/")
+allFileSizes tree = sizes [Directory "/"]
   where
-    sizes :: [File] -> File -> Map.Map [File] Int
-    sizes parentPath f@(RegularFile size _) = Map.singleton (f : parentPath) size
-    sizes parentPath f@(Directory _) =
+    sizes :: [File] -> Map.Map [File] Int
+    sizes (f@(RegularFile size _) : parentPath) = Map.singleton (f : parentPath) size
+    sizes (f@(Directory _) : parentPath) =
       let
         path = f : parentPath
-        children = tree ! path
-        newKnownSizes = foldl Map.union Map.empty . map (sizes path) $ children
-      in Map.insert path (sum . map (\x -> newKnownSizes ! (x : path)) $ children) newKnownSizes
+        children = map (\x -> x : path) . (tree !) $ path
+        newKnownSizes = foldl Map.union Map.empty . map sizes $ children
+      in Map.insert path (sum . map (newKnownSizes !) $ children) newKnownSizes
 
 sumOfSizesOfSmolDirectories :: [Command] -> Int
 sumOfSizesOfSmolDirectories = sum . Map.elems . Map.filter (\x -> x <= 100000) . Map.filterWithKey (\k _ -> isDir k) . allFileSizes . buildDirectoryTree
