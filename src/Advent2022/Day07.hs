@@ -70,7 +70,7 @@ sizeOfDirectoryToDelete xs =
     requiredFreeSpace = 30000000 - freeSpace
     dirs = Map.filterWithKey (\k _ -> isDir k) sizes
   in
-    minimum . Map.elems . Map.filter (\v -> v >= requiredFreeSpace) $ dirs
+    minimum . Map.elems . Map.filter (>= requiredFreeSpace) $ dirs
 
 printResults :: [Command] -> PuzzleAnswerPair
 printResults commands = PuzzleAnswerPair (part1, part2)
