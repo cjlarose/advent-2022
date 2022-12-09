@@ -53,17 +53,30 @@ allFileSizes tree = sizes [Directory "/"]
         newKnownSizes = foldl Map.union Map.empty . map sizes $ children
       in Map.insert path (sum . map (newKnownSizes !) $ children) newKnownSizes
 
+
+isDir :: [File] -> Bool
+isDir (Directory _ : _) = True
+isDir _ = False
+
 sumOfSizesOfSmolDirectories :: [Command] -> Int
 sumOfSizesOfSmolDirectories = sum . Map.elems . Map.filter (\x -> x <= 100000) . Map.filterWithKey (\k _ -> isDir k) . allFileSizes . buildDirectoryTree
-  where
-    isDir (Directory _ : _) = True
-    isDir _ = False
+
+sizeOfDirectoryToDelete :: [Command] -> Int
+sizeOfDirectoryToDelete xs =
+  let
+    sizes = allFileSizes . buildDirectoryTree $ xs
+    usedSpace = sizes ! [Directory "/"]
+    freeSpace = 70000000 - usedSpace
+    requiredFreeSpace = 30000000 - freeSpace
+    dirs = Map.filterWithKey (\k _ -> isDir k) sizes
+  in
+    minimum . Map.elems . Map.filter (\v -> v >= requiredFreeSpace) $ dirs
 
 printResults :: [Command] -> PuzzleAnswerPair
 printResults commands = PuzzleAnswerPair (part1, part2)
   where
     part1 = show . sumOfSizesOfSmolDirectories $ commands
-    part2 = ""
+    part2 = show . sizeOfDirectoryToDelete $ commands
 
 solve :: IO (Either String PuzzleAnswerPair)
 solve = parse inputParser printResults <$> getProblemInputAsText 7
