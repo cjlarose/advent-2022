@@ -9,11 +9,8 @@ import Advent.Parse (Parser, parse)
 import Advent.PuzzleAnswerPair (PuzzleAnswerPair (..))
 import Advent.CommonParsers (integerWithOptionalLeadingSign, symbol, token)
 import Data.Char (digitToInt)
-import qualified Data.Set as Set
-import qualified Data.Map as Map
-import Data.Map ((!))
 import Text.Megaparsec (some, eof, (<|>))
-import Text.Megaparsec.Char (newline, eol, digitChar)
+import Text.Megaparsec.Char (newline, eol)
 
 data Instruction = Noop | Addx Int
 
