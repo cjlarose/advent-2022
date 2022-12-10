@@ -20,32 +20,34 @@ inputParser = some (motion <* newline) <* eof
   where
     motion = foldl1 (<|>) . map (\(f, c) -> f <$> (token (char c) *> integerWithOptionalLeadingSign)) $ [(U, 'U'), (D, 'D'), (L, 'L'), (R, 'R')]
 
-uniqueTailPositions :: [Motion] -> Int
-uniqueTailPositions motions = length . nub $ allTailPositions
+headPositions :: [Motion] -> [(Int, Int)]
+headPositions = f (0, 0)
   where
     move (U x) (i, j) = [(i - di, j) | di <- [1..x]]
     move (D x) (i, j) = [(i + di, j) | di <- [1..x]]
     move (L x) (i, j) = [(i, j - dj) | dj <- [1..x]]
     move (R x) (i, j) = [(i, j + dj) | dj <- [1..x]]
+    f pos [] = [pos]
+    f pos (motion : xs) =
+      let intermediatePos = move motion pos
+      in pos : init intermediatePos ++ f (last intermediatePos) xs
+
+tailPositions :: [(Int, Int)] -> [(Int, Int)]
+tailPositions = f (0, 0)
+  where
     manhattanDistance (a, b) (c, d) = abs (a - c) + abs (b - d)
     neighbors (i, j) = [(i + di, j + dj) | di <- [-1..1], dj <- [-1..1]]
     adjacent x y = elem y . neighbors $ x
 
-    headPositions pos [] = [pos]
-    headPositions pos (motion : xs) =
-      let intermediatePos = move motion pos
-      in pos : init intermediatePos ++ headPositions (last intermediatePos) xs
-
-    allHeadPositions = headPositions (0, 0) motions
-
-    tailPositions pos [] = [pos]
-    tailPositions pos (headPos : xs) =
+    f pos [] = [pos]
+    f pos (headPos : xs) =
       let newTail = if adjacent headPos pos
                     then pos
                     else minimumBy (comparing $ manhattanDistance headPos) . neighbors $ pos
-      in newTail : tailPositions newTail xs
+      in newTail : f newTail xs
 
-    allTailPositions = tailPositions (0, 0) allHeadPositions
+uniqueTailPositions :: [Motion] -> Int
+uniqueTailPositions motions = length . nub . tailPositions . headPositions $ motions
 
 printResults :: [Motion] -> PuzzleAnswerPair
 printResults motions = PuzzleAnswerPair (part1, part2)
