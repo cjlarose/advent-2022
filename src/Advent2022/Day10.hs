@@ -24,13 +24,16 @@ inputParser = some instruction <* eof
    noop = Noop <$ symbol "noop"
    addx = Addx <$> (symbol "addx" *> token integerWithOptionalLeadingSign)
 
-signalStrengths :: [Int] -> [Instruction] -> [Int]
-signalStrengths keyCycles = f keyCycles . machineStates (1, 1)
+machineStates :: [Instruction] -> [(Int, Int)]
+machineStates = f (1, 1)
   where
-    machineStates (c, x) [] = []
-    machineStates (c, x) (Noop : xs) = (c, x) : machineStates (c + 1, x) xs
-    machineStates (c, x) (Addx y : xs) = (c, x) : (c + 1, x) : machineStates (c + 2, x + y) xs
+    f (c, x) [] = []
+    f (c, x) (Noop : xs) = (c, x) : f (c + 1, x) xs
+    f (c, x) (Addx y : xs) = (c, x) : (c + 1, x) : f (c + 2, x + y) xs
 
+signalStrengths :: [Int] -> [Instruction] -> [Int]
+signalStrengths keyCycles = f keyCycles . machineStates
+  where
     f [] states = []
     f (keyCycle : xs) states =
       let
