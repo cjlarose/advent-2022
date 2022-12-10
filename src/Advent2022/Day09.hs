@@ -37,7 +37,7 @@ tailPositions = f (0, 0)
   where
     manhattanDistance (a, b) (c, d) = abs (a - c) + abs (b - d)
     neighbors (i, j) = [(i + di, j + dj) | di <- [-1..1], dj <- [-1..1]]
-    adjacent x y = elem y . neighbors $ x
+    adjacent (xi, xj) (yi, yj) = abs (xi - yi) <= 1 && abs (xj - yj) <= 1
 
     f pos [] = [pos]
     f pos (headPos : xs) =
