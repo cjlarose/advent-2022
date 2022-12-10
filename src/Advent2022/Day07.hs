@@ -11,6 +11,7 @@ import Advent.CommonParsers (symbol, token)
 import Data.Text (Text, pack)
 import qualified Data.Map as Map
 import Data.Map ((!))
+import Data.List (partition)
 import Text.Megaparsec (some, eof, (<|>))
 import Text.Megaparsec.Char (lowerChar, newline, eol, string, letterChar, char, digitChar)
 
@@ -41,17 +42,19 @@ buildDirectoryTree = f Map.empty []
     f tree path (ChangeDirectory dir : xs) = f tree (Directory dir : path) xs
     f tree path (DirectoryListing files : xs) = f (Map.insert path files tree) path xs
 
-allFileSizes :: DirectoryTree -> Map.Map [File] Int
-allFileSizes tree = sizes [Directory "/"]
+allDirSizes :: DirectoryTree -> Map.Map [File] Int
+allDirSizes tree = sizes [Directory "/"]
   where
     sizes :: [File] -> Map.Map [File] Int
-    sizes (f@(RegularFile size _) : parentPath) = Map.singleton (f : parentPath) size
     sizes (f@(Directory _) : parentPath) =
       let
         path = f : parentPath
         children = map (\x -> x : path) . (tree !) $ path
-        newKnownSizes = foldl Map.union Map.empty . map sizes $ children
-      in Map.insert path (sum . map (newKnownSizes !) $ children) newKnownSizes
+        (childDirectories, childRegularFiles) = partition isDir children
+        newKnownSizes = foldl Map.union Map.empty . map sizes $ childDirectories
+        childRegularFilesSize = sum . map (\(RegularFile size _ : _) -> size) $ childRegularFiles
+        childDirectorySize = sum . map (newKnownSizes !) $ childDirectories
+      in Map.insert path (childRegularFilesSize + childDirectorySize) newKnownSizes
 
 
 isDir :: [File] -> Bool
@@ -59,12 +62,12 @@ isDir (Directory _ : _) = True
 isDir _ = False
 
 sumOfSizesOfSmolDirectories :: [Command] -> Int
-sumOfSizesOfSmolDirectories = sum . Map.elems . Map.filter (\x -> x <= 100000) . Map.filterWithKey (\k _ -> isDir k) . allFileSizes . buildDirectoryTree
+sumOfSizesOfSmolDirectories = sum . Map.elems . Map.filter (\x -> x <= 100000) . allDirSizes . buildDirectoryTree
 
 sizeOfDirectoryToDelete :: [Command] -> Int
 sizeOfDirectoryToDelete xs =
   let
-    sizes = allFileSizes . buildDirectoryTree $ xs
+    sizes = allDirSizes . buildDirectoryTree $ xs
     usedSpace = sizes ! [Directory "/"]
     freeSpace = 70000000 - usedSpace
     requiredFreeSpace = 30000000 - freeSpace
