@@ -49,11 +49,14 @@ tailPositions = f (0, 0)
 uniqueTailPositions :: [Motion] -> Int
 uniqueTailPositions motions = length . nub . tailPositions . headPositions $ motions
 
+ninthTailPositions :: [Motion] -> Int
+ninthTailPositions motions = length . nub . (\x -> x !! 9) . iterate tailPositions . headPositions $ motions
+
 printResults :: [Motion] -> PuzzleAnswerPair
 printResults motions = PuzzleAnswerPair (part1, part2)
   where
     part1 = show . uniqueTailPositions $ motions
-    part2 = "TODO"
+    part2 = show . ninthTailPositions $ motions
 
 solve :: IO (Either String PuzzleAnswerPair)
 solve = parse inputParser printResults <$> getProblemInputAsText 9
