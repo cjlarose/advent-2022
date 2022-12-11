@@ -4,8 +4,7 @@ module Advent2022.Day09
   )
 where
 
-import Data.List (nub, minimumBy)
-import Data.Ord (comparing)
+import Data.List (nub)
 import Text.Megaparsec (some, eof, (<|>))
 import Text.Megaparsec.Char (char, newline, eol, digitChar)
 import Advent.Input (getProblemInputAsText)
@@ -35,15 +34,20 @@ headPositions = f (0, 0)
 tailPositions :: [(Int, Int)] -> [(Int, Int)]
 tailPositions = f (0, 0)
   where
-    manhattanDistance (a, b) (c, d) = abs (a - c) + abs (b - d)
-    neighbors (i, j) = [(i + di, j + dj) | di <- [-1..1], dj <- [-1..1]]
     adjacent (xi, xj) (yi, yj) = abs (xi - yi) <= 1 && abs (xj - yj) <= 1
+    tailMove (ti, tj) (hi, hj) = (ti', tj')
+      where
+        (di, dj) = (hi - ti, hj - tj)
+        ti' = ti + if di >= 0
+                   then (di + 1) `div` 2
+                   else - ((- di + 1) `div` 2)
+        tj' = tj + if dj >= 0
+                   then (dj + 1) `div` 2
+                   else - ((- dj + 1) `div` 2)
 
     f pos [] = [pos]
     f pos (headPos : xs) =
-      let newTail = if adjacent headPos pos
-                    then pos
-                    else minimumBy (comparing $ manhattanDistance headPos) . neighbors $ pos
+      let newTail = if adjacent headPos pos then pos else tailMove pos headPos
       in newTail : f newTail xs
 
 uniqueTailPositions :: [Motion] -> Int
