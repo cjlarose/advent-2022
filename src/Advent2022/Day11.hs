@@ -10,7 +10,7 @@ import Data.Map ((!))
 import Text.Megaparsec (some, eof, (<|>), sepBy1)
 import Text.Megaparsec.Char (char)
 import Control.Monad (sequence_)
-import Control.Monad.State.Lazy (State, execState, get, put)
+import Control.Monad.State.Lazy (State, execState, get, put, modify)
 import Control.Monad.Loops (whileM_)
 
 import Advent.Input (getProblemInputAsText)
@@ -51,30 +51,31 @@ simulateRound = get >>= sequence_ . map simulateMonkey . Map.keys . monkeys
     simulateMonkey :: Int -> State MonkeyGame ()
     simulateMonkey mid = whileM_ (monkeyHasItems mid) (inspectNextItem mid)
 
-    getMonkey :: Int -> State MonkeyGame Monkey
-    getMonkey mid = get >>= (\game -> return . (flip (!) mid) . monkeys $ game)
+    lookupMonkey :: Int -> MonkeyGame -> Monkey
+    lookupMonkey mid = (flip (!) mid) . monkeys
 
     monkeyHasItems :: Int -> State MonkeyGame Bool
-    monkeyHasItems mid = getMonkey mid >>= return . not . null . items
+    monkeyHasItems mid = not . null . items . lookupMonkey mid <$> get
+
+    updateMonkey :: Int -> Monkey -> State MonkeyGame ()
+    updateMonkey mid monkey =
+      modify $ \game -> game { monkeys = Map.insert mid monkey . monkeys $ game }
 
     sendItemToMonkey :: Int -> Int -> State MonkeyGame ()
     sendItemToMonkey mid item = do
       game <- get
-      let monkey = monkeys game ! mid
+      let monkey = lookupMonkey mid game
       let newItems = items monkey ++ [item]
       let newMonkey = monkey { items = newItems }
-      let newMonkeys = Map.insert mid newMonkey . monkeys $ game
-      put $ game { monkeys = newMonkeys }
+      updateMonkey mid newMonkey
 
     popItem :: Int -> State MonkeyGame Int
     popItem mid = do
       game <- get
-      let monkey = monkeys game ! mid
+      let monkey = lookupMonkey mid game
       let (item : remaining) = items monkey
       let newMonkey = monkey { items = remaining }
-      let newMonkeys = Map.insert mid newMonkey . monkeys $ game
-      let newGame = game { monkeys = newMonkeys }
-      put newGame
+      updateMonkey mid newMonkey
       return item
 
     recordInspectionForMonkey :: Int -> State MonkeyGame ()
@@ -88,11 +89,11 @@ simulateRound = get >>= sequence_ . map simulateMonkey . Map.keys . monkeys
     inspectNextItem :: Int -> State MonkeyGame ()
     inspectNextItem mid = do
       item <- popItem mid
-      monkey <- getMonkey mid
-      let afterMonkeyOperation = operation monkey $ item
+      monkey <- lookupMonkey mid <$> get
+      let afterMonkeyOperation = operation monkey item
       recordInspectionForMonkey mid
       let newWorryLevel = afterMonkeyOperation `div` 3
-      let recipient = recipientMonkey monkey $ newWorryLevel
+      let recipient = recipientMonkey monkey newWorryLevel
       sendItemToMonkey recipient newWorryLevel
 
 simulateRounds :: Int -> State MonkeyGame ()
