@@ -26,6 +26,7 @@ dependencies:
 - containers
 - filepath
 - megaparsec
+- monad-loops
 - mtl
 - parser-combinators
 - tasty

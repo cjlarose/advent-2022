@@ -53,6 +53,7 @@ library
     , containers
     , filepath
     , megaparsec
+    , monad-loops
     , mtl
     , parser-combinators
     , tasty
@@ -76,6 +77,7 @@ executable advent2022-exe
     , containers
     , filepath
     , megaparsec
+    , monad-loops
     , mtl
     , parser-combinators
     , tasty
@@ -100,6 +102,7 @@ test-suite advent2022-test
     , containers
     , filepath
     , megaparsec
+    , monad-loops
     , mtl
     , parser-combinators
     , tasty
