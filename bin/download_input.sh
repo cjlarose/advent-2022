@@ -1,8 +1,10 @@
 #!/bin/bash
 
-if [[ $# != 1 ]]
+inputs_dir=./inputs
+
+if [[ $# -le 1 ]]
 then
-  echo 'Usage : download_input.sh problem_number' >&2
+  echo 'Usage : download_input.sh problem_number [problem_number]...' >&2
   exit 1
 fi
 
@@ -12,8 +14,10 @@ then
   exit 1
 fi
 
-problem_number=$1
-url='https://adventofcode.com/2022/day/'$problem_number'/input'
-output_filename=inputs/"$problem_number".txt
-mkdir -p inputs
-curl --silent "$url" -H 'Cookie: '"$ADVENT_SESSION_COOKIE" > "$output_filename"
+mkdir -p "$inputs_dir"
+
+for problem_number in "$@"; do
+  url='https://adventofcode.com/2022/day/'$problem_number'/input'
+  output_filename="$inputs_dir/$problem_number".txt
+  curl --silent "$url" -H 'Cookie: '"$ADVENT_SESSION_COOKIE" > "$output_filename"
+done
